@@ -4,24 +4,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.binlookupapp.data.remote.BinApiService
 import com.example.binlookupapp.presentation.ui.screens.HistoryScreen
 import com.example.binlookupapp.presentation.ui.screens.MainScreen
 import com.example.binlookupapp.ui.theme.BinLookupAppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
+    private val binApiService: BinApiService by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        // Тестовый вызов API
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val binInfo = binApiService.getBinInfo("45717360")
+                Timber.d("API Response: $binInfo")
+            } catch (e: Exception) {
+                Timber.e("API Error: ${e.message}")
+            }
+        }
         setContent {
             BinLookupAppTheme {
                 val navController = rememberNavController()
@@ -31,21 +40,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BinLookupAppTheme {
-        Greeting("Android")
     }
 }
