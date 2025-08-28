@@ -3,13 +3,12 @@ package com.example.binlookupapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.binlookupapp.data.local.BinHistoryDao
-import com.example.binlookupapp.data.local.BinHistoryEntity
-import com.example.binlookupapp.data.remote.BinApiService
+import com.example.binlookupapp.domain.usecases.GetBinInfoUseCase
+import com.example.binlookupapp.domain.usecases.GetHistoryUseCase
+import com.example.binlookupapp.domain.usecases.InsertHistoryUseCase
 import com.example.binlookupapp.presentation.ui.screens.HistoryScreen
 import com.example.binlookupapp.presentation.ui.screens.MainScreen
 import com.example.binlookupapp.ui.theme.BinLookupAppTheme
@@ -21,43 +20,30 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
-    private val binApiService: BinApiService by inject()
-    private val binHistoryDao: BinHistoryDao by inject()
+    private val getBinInfoUseCase: GetBinInfoUseCase by inject()
+    private val insertHistoryUseCase: InsertHistoryUseCase by inject()
+    private val getHistoryUseCase: GetHistoryUseCase by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Тестовый вызов API
+        // Тестовый вызов Use Cases
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val binInfo = binApiService.getBinInfo("45717360")
-                Timber.tag("Timber").d("API Response: $binInfo")
-
-                // Тестовая вставка в Room
-                val binHistoryEntity = BinHistoryEntity(
-                    bin = "45717360",
-                    timestamp = System.currentTimeMillis(),
-                    scheme = binInfo.scheme,
-                    type = binInfo.type,
-                    brand = binInfo.brand,
-                    countryName = binInfo.country?.name,
-                    latitude = binInfo.country?.latitude,
-                    longitude = binInfo.country?.longitude,
-                    bankName = binInfo.bank?.name,
-                    bankUrl = binInfo.bank?.url,
-                    bankPhone = binInfo.bank?.phone,
-                    bankCity = binInfo.bank?.city
-                )
-                binHistoryDao.insert(binHistoryEntity)
-                Timber.tag("Timber").d("Inserted into Room: $binHistoryEntity")
+                // Проверка GetBinInfoUseCase и InsertHistoryUseCase
+                val bin = "45717360"
+                val binInfo = getBinInfoUseCase(bin)
+                Timber.tag("Timber").d("UseCase GetBinInfo: $binInfo")
+                insertHistoryUseCase(bin, binInfo)
+                Timber.tag("Timber").d("UseCase InsertHistory: Inserted $bin")
             } catch (e: Exception) {
-                Timber.tag("Timber").e("API Error: ${e.message}")
+                Timber.tag("Timber").e("UseCase Error: ${e.message}")
             }
         }
 
-        // Тестовое получение данных из Room
+        // Проверка GetHistoryUseCase
         CoroutineScope(Dispatchers.IO).launch {
-            binHistoryDao.getAll().collectLatest { history ->
-                Timber.tag("Timber").d("Room History: $history")
+            getHistoryUseCase().collectLatest { history ->
+                Timber.tag("Timber").d("UseCase History: $history")
             }
         }
 
