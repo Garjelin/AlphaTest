@@ -20,33 +20,9 @@ import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
-    private val getBinInfoUseCase: GetBinInfoUseCase by inject()
-    private val insertHistoryUseCase: InsertHistoryUseCase by inject()
-    private val getHistoryUseCase: GetHistoryUseCase by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Тестовый вызов Use Cases
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                // Проверка GetBinInfoUseCase и InsertHistoryUseCase
-                val bin = "45717360"
-                val binInfo = getBinInfoUseCase(bin)
-                Timber.tag("Timber").d("UseCase GetBinInfo: $binInfo")
-                insertHistoryUseCase(bin, binInfo)
-                Timber.tag("Timber").d("UseCase InsertHistory: Inserted $bin")
-            } catch (e: Exception) {
-                Timber.tag("Timber").e("UseCase Error: ${e.message}")
-            }
-        }
-
-        // Проверка GetHistoryUseCase
-        CoroutineScope(Dispatchers.IO).launch {
-            getHistoryUseCase().collectLatest { history ->
-                Timber.tag("Timber").d("UseCase History: $history")
-            }
-        }
-
         setContent {
             BinLookupAppTheme {
                 val navController = rememberNavController()
