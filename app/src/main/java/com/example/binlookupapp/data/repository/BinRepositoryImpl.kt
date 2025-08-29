@@ -23,7 +23,7 @@ class BinRepositoryImpl(
             when (e.code()) {
                 404 -> throw Exception("No data found for BIN")
                 429 -> throw Exception("API rate limit exceeded")
-                else -> throw Exception("HTTP error: ${e.message()}")
+                else -> throw Exception("HTTP error ${e.message()}")
             }
         } catch (e: IOException) {
             throw Exception("Network error: ${e.message}")

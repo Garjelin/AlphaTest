@@ -22,7 +22,7 @@ class MainViewModel(
 
     fun fetchBin(bin: String) {
         if (bin.length < 6 || bin.length > 8 || !bin.all { it.isDigit() }) {
-            error.value = "BIN должен быть числом от 6 до 8 цифр"
+            error.value = "BIN must be a number between 6 and 8 digits"
             return
         }
 
@@ -34,7 +34,7 @@ class MainViewModel(
                 binInfo.value = info
                 insertHistoryUseCase(bin, info)
             } catch (e: Exception) {
-                error.value = e.message ?: "Неизвестная ошибка"
+                error.value = e.message ?: "Unknown error"
             } finally {
                 isLoading.value = false
             }

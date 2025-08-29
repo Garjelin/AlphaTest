@@ -11,10 +11,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -32,47 +40,59 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(navController: NavController) {
     val viewModel: HistoryViewModel = koinViewModel()
     val history = viewModel.history.collectAsState().value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "История запросов",
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        if (history.isEmpty()) {
-            Text(
-                text = "История пуста",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "Query history",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { navController.navigateUp() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
             )
-        } else {
-            LazyColumn(
-                modifier = Modifier.weight(1f)
-            ) {
-                items(history) { item ->
-                    HistoryCard(item)
-                    Spacer(modifier = Modifier.height(8.dp))
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (history.isEmpty()) {
+                Text(
+                    text = "History is empty",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(history) { item ->
+                        HistoryCard(item)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = { navController.navigateUp() },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Назад")
         }
     }
 }
@@ -93,12 +113,12 @@ fun HistoryCard(item: BinHistory) {
                 .padding(16.dp)
         ) {
             Text(text = "BIN: ${item.bin}", style = MaterialTheme.typography.titleMedium)
-            Text(text = "Дата: $date", style = MaterialTheme.typography.bodySmall)
-            Text(text = "Страна: ${item.countryName ?: "N/A"}")
+            Text(text = "Date: $date", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Country: ${item.countryName ?: "N/A"}")
             item.latitude?.let { lat ->
                 item.longitude?.let { lon ->
                     Text(
-                        text = "Координаты: $lat, $lon",
+                        text = "Coordinates: $lat, $lon",
                         modifier = Modifier.clickable {
                             val uri = Uri.parse("geo:$lat,$lon")
                             val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -108,11 +128,11 @@ fun HistoryCard(item: BinHistory) {
                     )
                 }
             }
-            Text(text = "Тип карты: ${item.scheme ?: "N/A"} / ${item.type ?: "N/A"} / ${item.brand ?: "N/A"}")
-            Text(text = "Банк: ${item.bankName ?: "N/A"}")
+            Text(text = "Card Type: ${item.scheme ?: "N/A"} / ${item.type ?: "N/A"} / ${item.brand ?: "N/A"}")
+            Text(text = "Bank: ${item.bankName ?: "N/A"}")
             item.bankUrl?.let { url ->
                 Text(
-                    text = "Сайт: $url",
+                    text = "Website: $url",
                     modifier = Modifier.clickable {
                         val uri = Uri.parse(if (url.startsWith("http")) url else "https://$url")
                         val intent = Intent(Intent.ACTION_VIEW, uri)
@@ -123,7 +143,7 @@ fun HistoryCard(item: BinHistory) {
             }
             item.bankPhone?.let { phone ->
                 Text(
-                    text = "Телефон: $phone",
+                    text = "Phone: $phone",
                     modifier = Modifier.clickable {
                         val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
                         context.startActivity(intent)
@@ -131,7 +151,7 @@ fun HistoryCard(item: BinHistory) {
                     color = Color.Blue
                 )
             }
-            Text(text = "Город: ${item.bankCity ?: "N/A"}")
+            Text(text = "City: ${item.bankCity ?: "N/A"}")
         }
     }
 }
