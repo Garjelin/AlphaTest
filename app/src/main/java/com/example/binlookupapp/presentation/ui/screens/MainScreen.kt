@@ -69,7 +69,7 @@ fun MainScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        viewModel.binInfo.let { info ->
+        viewModel.binInfo.value?.let { info ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -79,9 +79,9 @@ fun MainScreen(navController: NavController) {
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Text("Страна: ${info.component1()?.country?.name ?: "N/A"}")
-                    info.component1()?.country?.latitude?.let { lat ->
-                        info.component1()?.country?.longitude?.let { lon ->
+                    Text("Страна: ${info.country?.name ?: "N/A"}")
+                    info.country?.latitude?.let { lat ->
+                        info.country?.longitude?.let { lon ->
                             Text(
                                 text = "Координаты: $lat, $lon",
                                 modifier = Modifier.clickable {
@@ -93,9 +93,9 @@ fun MainScreen(navController: NavController) {
                             )
                         }
                     }
-                    Text("Тип карты: ${info.component1()?.scheme ?: "N/A"} / ${info.component1()?.type ?: "N/A"} / ${info.component1()?.brand ?: "N/A"}")
-                    Text("Банк: ${info.component1()?.bank?.name ?: "N/A"}")
-                    info.component1()?.bank?.url?.let { url ->
+                    Text("Тип карты: ${info.scheme ?: "N/A"} / ${info.type ?: "N/A"} / ${info.brand ?: "N/A"}")
+                    Text("Банк: ${info.bank?.name ?: "N/A"}")
+                    info.bank?.url?.let { url ->
                         Text(
                             text = "Сайт: $url",
                             modifier = Modifier.clickable {
@@ -106,7 +106,7 @@ fun MainScreen(navController: NavController) {
                             color = Color.Blue
                         )
                     }
-                    info.component1()?.bank?.phone?.let { phone ->
+                    info.bank?.phone?.let { phone ->
                         Text(
                             text = "Телефон: $phone",
                             modifier = Modifier.clickable {
@@ -116,7 +116,7 @@ fun MainScreen(navController: NavController) {
                             color = Color.Blue
                         )
                     }
-                    Text("Город: ${info.component1()?.bank?.city ?: "N/A"}")
+                    Text("Город: ${info.bank?.city ?: "N/A"}")
                 }
             }
         }

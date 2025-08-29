@@ -1,5 +1,7 @@
 package com.example.binlookupapp.presentation.ui.screens
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -22,17 +24,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.binlookupapp.domain.models.BinHistory
 import com.example.binlookupapp.presentation.viewmodels.HistoryViewModel
+import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
 @Composable
 fun HistoryScreen(navController: NavController) {
-    val viewModel: HistoryViewModel = viewModel()
+    val viewModel: HistoryViewModel = koinViewModel()
     val history = viewModel.history.collectAsState().value
 
     Column(
@@ -98,8 +100,8 @@ fun HistoryCard(item: BinHistory) {
                     Text(
                         text = "Координаты: $lat, $lon",
                         modifier = Modifier.clickable {
-                            val uri = android.net.Uri.parse("geo:$lat,$lon")
-                            val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
+                            val uri = Uri.parse("geo:$lat,$lon")
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
                             context.startActivity(intent)
                         },
                         color = Color.Blue
@@ -112,8 +114,8 @@ fun HistoryCard(item: BinHistory) {
                 Text(
                     text = "Сайт: $url",
                     modifier = Modifier.clickable {
-                        val uri = android.net.Uri.parse(if (url.startsWith("http")) url else "https://$url")
-                        val intent = android.content.Intent(android.content.Intent.ACTION_VIEW, uri)
+                        val uri = Uri.parse(if (url.startsWith("http")) url else "https://$url")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
                         context.startActivity(intent)
                     },
                     color = Color.Blue
@@ -123,7 +125,7 @@ fun HistoryCard(item: BinHistory) {
                 Text(
                     text = "Телефон: $phone",
                     modifier = Modifier.clickable {
-                        val intent = android.content.Intent(android.content.Intent.ACTION_DIAL, android.net.Uri.parse("tel:$phone"))
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
                         context.startActivity(intent)
                     },
                     color = Color.Blue

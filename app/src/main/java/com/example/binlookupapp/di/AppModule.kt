@@ -13,5 +13,5 @@ val appModule = module {
     single { InsertHistoryUseCase(get()) }
     single { GetHistoryUseCase(get()) }
     viewModel { MainViewModel(get(), get()) }
-    viewModel { HistoryViewModel() }
+    viewModel { HistoryViewModel(get()) }
 }
