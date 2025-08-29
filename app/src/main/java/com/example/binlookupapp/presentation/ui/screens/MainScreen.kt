@@ -71,7 +71,6 @@ fun MainScreen(navController: NavController) {
                 label = { Text("Enter BIN (6-8 digits)") },
                 modifier = Modifier.fillMaxWidth()
             )
-//            Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -111,7 +110,7 @@ fun MainScreen(navController: NavController) {
                     if (viewModel.binInfo.value == null) {
                         Text(
                             text = "Enter BIN to display information",
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -133,27 +132,36 @@ fun MainScreen(navController: NavController) {
                             }
                             Text("Card Type: ${info.scheme ?: "N/A"} / ${info.type ?: "N/A"} / ${info.brand ?: "N/A"}")
                             Text("Bank: ${info.bank?.name ?: "N/A"}")
-                            info.bank?.url?.let { url ->
-                                Text(
-                                    text = "Website: $url",
-                                    modifier = Modifier.clickable {
-                                        val uri = Uri.parse(if (url.startsWith("http")) url else "https://$url")
+                            Text(
+                                text = "Website: ${info.bank?.url ?: "N/A"}",
+                                modifier = if (info.bank?.url != null) {
+                                    Modifier.clickable {
+                                        val uri = Uri.parse(
+                                            if (info.bank.url!!.startsWith("http")) info.bank.url!! else "https://${info.bank.url!!}"
+                                        )
                                         val intent = Intent(Intent.ACTION_VIEW, uri)
                                         context.startActivity(intent)
-                                    },
-                                    color = Color.Blue
-                                )
-                            }
-                            info.bank?.phone?.let { phone ->
-                                Text(
-                                    text = "Phone: $phone",
-                                    modifier = Modifier.clickable {
-                                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                                    }
+                                } else {
+                                    Modifier
+                                },
+                                color = if (info.bank?.url != null) Color.Blue else Color.Black
+                            )
+                            Text(
+                                text = "Phone: ${info.bank?.phone ?: "N/A"}",
+                                modifier = if (info.bank?.phone != null) {
+                                    Modifier.clickable {
+                                        val intent = Intent(
+                                            Intent.ACTION_DIAL,
+                                            Uri.parse("tel:${info.bank.phone}")
+                                        )
                                         context.startActivity(intent)
-                                    },
-                                    color = Color.Blue
-                                )
-                            }
+                                    }
+                                } else {
+                                    Modifier
+                                },
+                                color = if (info.bank?.phone != null) Color.Blue else Color.Black
+                            )
                             Text("City: ${info.bank?.city ?: "N/A"}")
                         }
                     }

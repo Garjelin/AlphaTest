@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -130,27 +129,32 @@ fun HistoryCard(item: BinHistory) {
             }
             Text(text = "Card Type: ${item.scheme ?: "N/A"} / ${item.type ?: "N/A"} / ${item.brand ?: "N/A"}")
             Text(text = "Bank: ${item.bankName ?: "N/A"}")
-            item.bankUrl?.let { url ->
-                Text(
-                    text = "Website: $url",
-                    modifier = Modifier.clickable {
-                        val uri = Uri.parse(if (url.startsWith("http")) url else "https://$url")
+            Text(
+                text = "Website: ${item.bankUrl ?: "N/A"}",
+                modifier = if (item.bankUrl != null) {
+                    Modifier.clickable {
+                        val uri =
+                            Uri.parse(if (item.bankUrl.startsWith("http")) item.bankUrl else "https://${item.bankUrl}")
                         val intent = Intent(Intent.ACTION_VIEW, uri)
                         context.startActivity(intent)
-                    },
-                    color = Color.Blue
-                )
-            }
-            item.bankPhone?.let { phone ->
-                Text(
-                    text = "Phone: $phone",
-                    modifier = Modifier.clickable {
-                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:$phone"))
+                    }
+                } else {
+                    Modifier
+                },
+                color = if (item.bankUrl != null) Color.Blue else Color.Black
+            )
+            Text(
+                text = "Phone: ${item.bankPhone ?: "N/A"}",
+                modifier = if (item.bankPhone != null) {
+                    Modifier.clickable {
+                        val intent = Intent(Intent.ACTION_DIAL, Uri.parse("tel:${item.bankPhone}"))
                         context.startActivity(intent)
-                    },
-                    color = Color.Blue
-                )
-            }
+                    }
+                } else {
+                    Modifier
+                },
+                color = if (item.bankPhone != null) Color.Blue else Color.Black
+            )
             Text(text = "City: ${item.bankCity ?: "N/A"}")
         }
     }
